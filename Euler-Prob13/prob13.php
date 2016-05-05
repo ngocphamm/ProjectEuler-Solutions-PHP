@@ -23,6 +23,9 @@ function main()
     $realSum = [];
     $startUnit = 0;
 
+    /**
+     * This use the elementary sum method from right to left.
+     */
     for ($i = ($digitCount - 1); $i >= 0; $i--) {
         $sum = 0;
 
@@ -33,19 +36,21 @@ function main()
         $sumSplit = array_reverse(str_split(strval($sum)));
 
         for ($k = 0; $k < count($sumSplit); $k++) {
-            if ( ! isset($realSum[$startUnit + $k])) {
-                $realSum[$startUnit + $k] = 0;
-            }
+            // NOTE: This null coalesce (??) only works on PHP 7
+            $realSum[$startUnit + $k] = $realSum[$startUnit + $k] ?? 0;
 
+            // Get the sum by column
             $colSum = $realSum[$startUnit + $k] + intval($sumSplit[$k]);
 
+            // Put remainder to the current result column
             $realSum[$startUnit + $k] = $colSum % 10;
 
+            // If the column sum is >= 10, put the carry number to the next result column
             if ($colSum >= 10) {
-                if ( ! isset($realSum[$startUnit + $k + 1])) {
-                    $realSum[$startUnit + $k + 1] = 0;
-                }
-                $realSum[$startUnit + $k + 1] += 1;
+                $realSum[$startUnit + $k + 1] = $realSum[$startUnit + $k + 1] ?? 0;
+
+                // NOTE: This intdiv() is also only on PHP 7
+                $realSum[$startUnit + $k + 1] += intdiv($colSum, 10);
             }
         }
 
